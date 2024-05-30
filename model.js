@@ -28,7 +28,7 @@ module.exports = {
 
     async addBooks(request) {
         const { title, author, genre } = request.body
-        const id = (await this.getBooks()).length + 1
+        const id = (await this.getBooks()).length + 2
         const sql = 'INSERT INTO book (id, title, author, genre) VALUES ($1, $2, $3, $4) RETURNING *';
         const result = await db.query(sql, [id, title, author, genre]);
         return "Book added with ID: ${id}", [id];
@@ -44,18 +44,17 @@ module.exports = {
         const title = request.body.title ?? null;
         const author = request.body.author ?? null;
         const genre = request.body.genre ?? null;
-        console.log(title)
 
-        if (title != null) {
+        if (title.length > 0) {
             const sql = 'UPDATE book SET title = $1 WHERE id = $2';
             const result = await db.query(sql, [title, id]);
             console.log(result)
         }
-        if (author != null) {
+        if (author.length > 0) {
             const sql = 'UPDATE book SET author = $1 WHERE id = $2';
             const result = await db.query(sql, [author, id]);
         }
-        if (genre != null) {
+        if (genre.length > 0) {
             const sql = 'UPDATE book SET genre = $1 WHERE id = $2';
             const result = await db.query(sql, [genre, id]);
         }
@@ -73,15 +72,13 @@ module.exports = {
     async register(request) {
         const saltRounds = 10;
         const { username, password} = request.body
-        console.log("came here to hash")
 
         bcrypt.hash(password, saltRounds, async (err, hash)  =>  {
             if (err) {
                 console.error(err.message);
                 return;
             }
-        
-            console.log('Hashed password:', hash);
+            
             const sql = 'INSERT INTO Admin (username, user_password) VALUES ($1, $2) RETURNING *';
             const result = await db.query(sql, [username, hash]);
         });

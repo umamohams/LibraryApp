@@ -46,10 +46,6 @@ router.get('/register/page', (req, res) => {
     res.sendFile(__dirname + "/register.html");
 });
 
-router.get('/login/page', (req, res) => {
-    res.sendFile(__dirname + "/login.html");
-});
-
 router.get('/user/page', (req, res) => {
     res.sendFile(__dirname + "/user_page.html");
 });

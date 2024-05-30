@@ -37,11 +37,17 @@
     <div id="results">
         Loading books...
     </div>
-    <div id="addDataForm" style="display:none;">
-        <h2>Add Book</h2>
+    <div id="adminForm" style="display:none;">
+        <h2>Admin function</h2>
+        <input type="text" id="id" placeholder="ID">
         <input type="text" id="addTitle" placeholder="Title">
-        <button id="addTitleButton">Add Title</button>
-        <div id="addTitleMessage"></div>
+        <input type="text" id="addAuthor" placeholder="Author">
+        <input type="text" id="addGenre" placeholder="Genre">
+        <button id="addBookButton">Add Book</button>
+        <button id="updateBookButton">Update Book</button>
+        <button id="deleteBookButton">Delete Book</button>
+        <button id="logoutButton">Logout</button>
+        <div id="adminMessage"></div>
     </div>
 
     <script>
@@ -55,19 +61,28 @@
             const resultsContainer = document.getElementById('results');
 
             const loginForm = document.getElementById('loginForm');
-            const addDataForm = document.getElementById('addDataForm');
+            const adminForm = document.getElementById('adminForm');
 
             const loginButton = document.getElementById('loginButton');
-            const addTitleButton = document.getElementById('addTitleButton');
+            const addBookButton = document.getElementById('addBookButton');
+            const updateBookButton = document.getElementById('updateBookButton');
+            const deleteBookButton = document.getElementById('deleteBookButton');
+            const logoutButton = document.getElementById('logoutButton');
+
+
 
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const addTitleInput = document.getElementById('addTitle');
+            const addAuthorInput = document.getElementById('addAuthor');
+            const addGenreInput = document.getElementById('addGenre');
+            const addIdInput = document.getElementById('id');
 
             const loginMessage = document.getElementById('loginMessage');
-            const addTitleMessage = document.getElementById('addTitleMessage');
+            const adminMessage = document.getElementById('adminMessage');
 
-            
+
+
 
             // Function to fetch and display data
             const fetchData = (url) => {
@@ -93,6 +108,172 @@
                     })
                     .catch(error => {
                         resultsContainer.innerHTML = 'Failed to load books: ' + error.message;
+                    });
+            };
+
+            const handleLogin = () => {
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+
+                console.log(username + password)
+
+                fetch('http://localhost:3000/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Login Response Error ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                            localStorage.setItem('jwt', data.token);
+                            loginForm.style.display = 'none';
+                            adminForm.style.display = 'block';
+                            loginMessage.textContent = 'Login was sucessfull'
+                    })
+                    .catch(error => {
+                        loginMessage.textContent = 'Failed to login: ' + error.message;
+                    });
+            };
+
+            const handleLogout = () => {
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+
+                localStorage.removeItem('jwt');
+                adminMessage.textContent = 'You have logged out successfully'
+                adminForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            };
+
+            const handleAddBook = () => {
+                const title = addTitleInput.value.trim();
+                const author = addAuthorInput.value.trim();
+                const genre = addGenreInput.value.trim();
+
+                const token = localStorage.getItem('jwt');
+
+                if (!token) {
+                adminMessage.textContent = 'Not properly logged in';
+                return;
+                }
+
+                if (title === '' || author === '' || genre === '') {
+                    adminMessage.textContent = 'Please enter all needed values.';
+                    return;
+                }
+
+                fetch('http://localhost:3000/auth/api/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ title, author, genre })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Api response for adding a book was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(book => {
+                        fetchData('http://localhost:3000/api/books');
+                        addTitleInput.value = '';
+                        addAuthorInput.value = '';
+                        addGenreInput.value = '';
+                        adminMessage.textContent = `Book added successfully.`;
+                    })
+                    .catch(error => {
+                        adminMessage.textContent = 'Failed to add book: ' + error.message;
+                    });
+            };
+
+            const handleUpdateBook = () => {
+                const title = addTitleInput.value;
+                const author = addAuthorInput.value;
+                const genre = addGenreInput.value;
+                const id = addIdInput.value;
+
+                const token = localStorage.getItem('jwt');
+
+                if (!token) {
+                adminMessage.textContent = 'Not properly logged in';
+                return;
+                }
+
+                if (id === '') {
+                    adminMessage.textContent = 'Please enter id';
+                    return;
+                }
+
+                fetch(`http://localhost:3000/auth/api/id/${encodeURIComponent(id)}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ title, author, genre })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Api response for updating book was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(book => {
+                        fetchData('http://localhost:3000/api/books');
+                        addTitleInput.value = '';
+                        addAuthorInput.value = '';
+                        addGenreInput.value = '';
+                        addIdInput.value = '';
+                        adminMessage.textContent = `Book updated successfully.`;
+                    })
+                    .catch(error => {
+                        adminMessage.textContent = 'Failed to update book: ' + error.message;
+                    });
+            };
+
+            const handleDeleteBook = () => {
+                const id = addIdInput.value;
+
+                const token = localStorage.getItem('jwt');
+
+                if (!token) {
+                adminMessage.textContent = 'Not properly logged in';
+                return;
+                }
+
+                if (id === '') {
+                    adminMessage.textContent = 'Please enter id';
+                    return;
+                }
+
+                fetch(`http://localhost:3000/auth/api/delete/${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Api response for deleting book was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(book => {
+                        fetchData('http://localhost:3000/api/books');
+                        addIdInput.value = '';
+                        adminMessage.textContent = `Book deleted successfully.`;
+                    })
+                    .catch(error => {
+                        adminMessage.textContent = 'Failed to delete book: ' + error.message;
                     });
             };
 
@@ -126,6 +307,12 @@
                     fetchData(`http://localhost:3000/api/genre/${encodeURIComponent(query)}`);
                 }
             });
+
+            addBookButton.addEventListener('click', handleAddBook);
+            loginButton.addEventListener('click', handleLogin);
+            logoutButton.addEventListener('click', handleLogout);
+            updateBookButton.addEventListener('click', handleUpdateBook);
+            deleteBookButton.addEventListener('click', handleDeleteBook);
         });
     </script>
 </body>

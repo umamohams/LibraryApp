@@ -12,11 +12,8 @@ function makeToken(user) {
 }
 
 router.post('/login', async (req, res) => {
-    console.log("I came second here is to login")
-    console.log(req.body.username + " " + req.body.password)
    try {
         const pass = await model.getUser(req);
-        console.log(pass)
 
         bcrypt.compare(req.body.password, pass, async (err, result) => {
             if (err) {
@@ -40,8 +37,6 @@ router.post('/login', async (req, res) => {
 
 
 router.post('/register', async (req, res) => {
-    console.log("I came second here is to register")
-    console.log(req.body.username + " " + req.body.password)
     try {
         const user = await model.register(req);
         res.status(200).json(user);
