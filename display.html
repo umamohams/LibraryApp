@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alpine.js: Displaying API data in a HTML table</title>
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+      td,
+      th {
+        border: 1px solid #ccc;
+        padding: 5px 15px 5px 5px;
+        text-align: left;
+      }
+    </style>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  </head>
+  <body>
+    <div
+      x-cloak
+      x-data="{books: [], 'isLoading': true}"
+      x-init="fetch('http://localhost:3000/api/books')
+      .then(response => response.json())
+      .then(response => { books = response; isLoading = false; console.log(response);})"
+    >
+      <h1 x-show="isLoading">Loading...</h1>
+      <table x-show="!isLoading">
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Genre</th>
+        </tr>
+        <template x-for="book in books" :key="book.id">
+          <tr>
+            <td x-text="book.title"></td>
+            <td x-text="book.author"></td>
+            <td x-text="book.genre"></td>
+          </tr>
+        </template>
+      </table>
+    </div>
+  </body>
+</html>

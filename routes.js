@@ -42,52 +42,17 @@ router.get("/genre/:genre", async (req, res) => {
     }
 });
 
-
-
-router.post("/",     [
-    body("title").notEmpty(),
-    body("author").notEmpty(),
-    body("genre").notEmpty(),
-  ], async (req, res) => {
-
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-    try {
-        const result = await model.addBooks(req);
-        res.status(200).send(result);
-    } catch (e) {
-        res.status(400).end();
-    }
+router.get('/register/page', (req, res) => {
+    res.sendFile(__dirname + "/register.html");
 });
 
-router.patch("/id/:id", async (req, res) => {
-
-    try {
-        const result = await model.updateBooks(req, req.params.id);
-        res.status(200).send(result);
-    } catch (e) {
-        res.status(400).end();
-    }
+router.get('/login/page', (req, res) => {
+    res.sendFile(__dirname + "/login.html");
 });
 
-router.delete("/delete/:id", async (req, res) => {
-
-    try {
-        const result = await model.deleteBooks(req.params.id);
-        res.status(200).send(result);
-    } catch (e) {
-        res.status(400).end();
-    }
+router.get('/user/page', (req, res) => {
+    res.sendFile(__dirname + "/user_page.html");
 });
-
-
-
-
-
 
 
 module.exports = router;

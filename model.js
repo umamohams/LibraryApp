@@ -1,4 +1,6 @@
 const db = require('./postgres');
+const bcrypt = require('bcryptjs');
+
 module.exports = {
     async getBooks() {
         const sql = `SELECT * FROM book`;
@@ -58,5 +60,31 @@ module.exports = {
             const result = await db.query(sql, [genre, id]);
         }
         return "Book modified with ID: ${id}", [id];
+    },
+
+    async getUser(request) {
+        const username = request.body.username
+        const sql = 'SELECT * FROM Admin WHERE username = $1';
+        const result = await db.query(sql, [username]);
+        const user = result.rows;
+        return user[0].user_password;
+    },
+
+    async register(request) {
+        const saltRounds = 10;
+        const { username, password} = request.body
+        console.log("came here to hash")
+
+        bcrypt.hash(password, saltRounds, async (err, hash)  =>  {
+            if (err) {
+                console.error(err.message);
+                return;
+            }
+        
+            console.log('Hashed password:', hash);
+            const sql = 'INSERT INTO Admin (username, user_password) VALUES ($1, $2) RETURNING *';
+            const result = await db.query(sql, [username, hash]);
+        });
+        return "Admin added with username: ${username}",[username];
     },
 };

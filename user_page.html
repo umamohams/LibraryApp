@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch and Search API Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .user {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Books</h1>
+    <input type="text" id="searchInputTitle" placeholder="Search by Title">
+    <button id="searchButtonTitle">Search</button>
+    <input type="text" id="searchInputAuthor" placeholder="Search by Author">
+    <button id="searchButtonAuthor">Search</button>
+    <input type="text" id="searchInputGenre" placeholder="Search by Genre">
+    <button id="searchButtonGenre">Search</button>
+    <div id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button id="loginButton">Login</button>
+        <div id="loginMessage"></div>
+    </div>
+    <div id="results">
+        Loading books...
+    </div>
+    <div id="addDataForm" style="display:none;">
+        <h2>Add Book</h2>
+        <input type="text" id="addTitle" placeholder="Title">
+        <button id="addTitleButton">Add Title</button>
+        <div id="addTitleMessage"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchButtonTitle = document.getElementById('searchButtonTitle');
+            const searchInputTitle = document.getElementById('searchInputTitle');
+            const searchButtonAuthor = document.getElementById('searchButtonAuthor');
+            const searchInputAuthor = document.getElementById('searchInputAuthor');
+            const searchButtonGenre = document.getElementById('searchButtonGenre');
+            const searchInputGenre = document.getElementById('searchInputGenre');
+            const resultsContainer = document.getElementById('results');
+
+            const loginForm = document.getElementById('loginForm');
+            const addDataForm = document.getElementById('addDataForm');
+
+            const loginButton = document.getElementById('loginButton');
+            const addTitleButton = document.getElementById('addTitleButton');
+
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const addTitleInput = document.getElementById('addTitle');
+
+            const loginMessage = document.getElementById('loginMessage');
+            const addTitleMessage = document.getElementById('addTitleMessage');
+
+            
+
+            // Function to fetch and display data
+            const fetchData = (url) => {
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Response failure' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        resultsContainer.innerHTML = '';
+                        if (data.length === 0) {
+                            resultsContainer.innerHTML = 'No books found.';
+                        } else {
+                            data.forEach(book => {
+                                const bookDiv = document.createElement('div');
+                                bookDiv.className = 'book';
+                                bookDiv.textContent = `ID: ${book.id}, Title: ${book.title}, Author: ${book.author}, Genre: ${book.genre}`;
+                                resultsContainer.appendChild(bookDiv);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        resultsContainer.innerHTML = 'Failed to load books: ' + error.message;
+                    });
+            };
+
+            // Fetch and display initial data
+            fetchData('http://localhost:3000/api/books');
+
+            // Fetch and display search results on button click
+            searchButtonTitle.addEventListener('click', () => {
+                const query = searchInputTitle.value.trim();
+                if (query === '') {
+                    fetchData('http://localhost:3000/api/books');
+                } else {
+                    fetchData(`http://localhost:3000/api/title/${encodeURIComponent(query)}`);
+                }
+            });
+
+            searchButtonAuthor.addEventListener('click', () => {
+                const query = searchInputAuthor.value.trim();
+                if (query === '') {
+                    fetchData('http://localhost:3000/api/books');
+                } else {
+                    fetchData(`http://localhost:3000/api/author/${encodeURIComponent(query)}`);
+                }
+            });
+
+            searchButtonGenre.addEventListener('click', () => {
+                const query = searchInputGenre.value.trim();
+                if (query === '') {
+                    fetchData('http://localhost:3000/api/books');
+                } else {
+                    fetchData(`http://localhost:3000/api/genre/${encodeURIComponent(query)}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
