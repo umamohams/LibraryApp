@@ -50,5 +50,11 @@ router.get('/user/page', (req, res) => {
     res.sendFile(__dirname + "/user_page.html");
 });
 
+const genreValues = ['Science-fiction', 'Action', 'Adventure', 'Mystery', 'Horror', 'Thriller', 'Suspense', 'Historical-fiction', 'Romance', 'Graphic-novel', 'Autobiography', 'Biography', 'Travel', 'Crime', 'Humor', 'Guide', 'Religion', 'Humanities'];
+
+router.get('/defined-genre', (req, res) => {
+    res.json(genreValues);
+});
+
 
 module.exports = router;
