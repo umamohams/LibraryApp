@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetch and Search API Example</title>
+    <title>Library user page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,10 +78,8 @@
             const addGenreInput = document.getElementById('addGenre');
             const addIdInput = document.getElementById('id');
 
-            const loginMessage = document.getElementById('loginMessage');
             const adminMessage = document.getElementById('adminMessage');
-
-
+            const loginMessage = document.getElementById('loginMessage');
 
 
             // Function to fetch and display data
@@ -115,8 +113,6 @@
                 const username = usernameInput.value;
                 const password = passwordInput.value;
 
-                console.log(username + password)
-
                 fetch('http://localhost:3000/auth/login', {
                     method: 'POST',
                     headers: {
@@ -126,15 +122,15 @@
                 })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Login Response Error ' + response.statusText);
+                            throw new Error(response.statusText);
                         }
                         return response.json();
                     })
                     .then(data => {
+                            loginMessage.textContent = 'Login was sucessfull'
                             localStorage.setItem('jwt', data.token);
                             loginForm.style.display = 'none';
                             adminForm.style.display = 'block';
-                            loginMessage.textContent = 'Login was sucessfull'
                     })
                     .catch(error => {
                         loginMessage.textContent = 'Failed to login: ' + error.message;
@@ -146,9 +142,10 @@
                 const password = passwordInput.value;
 
                 localStorage.removeItem('jwt');
-                adminMessage.textContent = 'You have logged out successfully'
                 adminForm.style.display = 'none';
                 loginForm.style.display = 'block';
+                adminMessage.textContent = '';
+                loginMessage.textContent = '';
             };
 
             const handleAddBook = () => {
@@ -159,7 +156,7 @@
                 const token = localStorage.getItem('jwt');
 
                 if (!token) {
-                adminMessage.textContent = 'Not properly logged in';
+                    adminMessage.textContent = 'Not properly logged in';
                 return;
                 }
 
@@ -232,7 +229,7 @@
                         addAuthorInput.value = '';
                         addGenreInput.value = '';
                         addIdInput.value = '';
-                        adminMessage.textContent = `Book updated successfully.`;
+                        adminMessage.textContent = `Book update successfully.`;
                     })
                     .catch(error => {
                         adminMessage.textContent = 'Failed to update book: ' + error.message;

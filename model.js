@@ -1,7 +1,23 @@
 const db = require('./postgres');
 const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
+
+    async findId() {
+        
+        const res = await db.query('SELECT id FROM book ORDER BY id ASC');
+        const numbers = res.rows.map(row => parseInt(row.id));
+        const set = new Set(numbers);
+        let mayBeId = 1;
+
+        while (set.has(mayBeId)) {
+            mayBeId++;
+          }
+        
+        return mayBeId;
+      },
+
     async getBooks() {
         const sql = `SELECT * FROM book`;
         const result = await db.query(sql);
@@ -28,11 +44,14 @@ module.exports = {
 
     async addBooks(request) {
         const { title, author, genre } = request.body
-        const id = (await this.getBooks()).length + 2
+        const id = await this.findId();
+
         const sql = 'INSERT INTO book (id, title, author, genre) VALUES ($1, $2, $3, $4) RETURNING *';
         const result = await db.query(sql, [id, title, author, genre]);
         return "Book added with ID: ${id}", [id];
     },
+
+      
 
     async deleteBooks(id) {
         const sql = 'DELETE FROM book WHERE id = $1';
@@ -78,7 +97,7 @@ module.exports = {
                 console.error(err.message);
                 return;
             }
-            
+
             const sql = 'INSERT INTO Admin (username, user_password) VALUES ($1, $2) RETURNING *';
             const result = await db.query(sql, [username, hash]);
         });
