@@ -46,8 +46,8 @@ router.get('/register/page', (req, res) => {
     res.sendFile(__dirname + "/register.html");
 });
 
-router.get('/user/page', (req, res) => {
-    res.sendFile(__dirname + "/user_page.html");
+router.get('/main/page', (req, res) => {
+    res.sendFile(__dirname + "/main_page.html");
 });
 
 const genreValues = ['Science-fiction', 'Action', 'Adventure', 'Mystery', 'Horror', 'Thriller', 'Suspense', 'Historical-fiction', 'Romance', 'Graphic-novel', 'Autobiography', 'Biography', 'Travel', 'Crime', 'Humor', 'Guide', 'Religion', 'Humanities'];

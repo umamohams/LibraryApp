@@ -84,7 +84,6 @@
              const genreDropDown = document.getElementById('dropdown');
          
          
-             // Function to fetch and display data
              const fetchData = (url) => {
                  fetch(url)
                      .then(response => {
@@ -297,10 +296,8 @@
             }};
          
          
-             // Fetch and display initial data
              fetchData('http://localhost:3000/api/books');
          
-             // Fetch and display search results on button click
              searchButtonTitle.addEventListener('click', () => {
                  const query = searchInputTitle.value.trim();
                  if (query === '') {
